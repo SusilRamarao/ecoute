@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecoute - Web Audio Transcriber</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #FFFCF2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .recording {
+            background: linear-gradient(45deg, #ff4757, #ff3742) !important;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .transcript-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .transcript {
+            font-size: 18px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            color: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .note {
+            background: rgba(23, 162, 184, 0.2);
+            border: 1px solid #17a2b8;
+            color: #d1ecf1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .mic-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #666;
+            display: inline-block;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .mic-active {
+            background: #ff4757;
+            box-shadow: 0 0 10px #ff4757;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Ecoute - Audio Transcriber</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Note:</strong> This web app can only access microphone audio due to browser security restrictions. 
+            System/speaker audio capture is not available in web browsers.
+        </div>
+        
+        <div class="status" id="status">
+            <span class="mic-indicator" id="micIndicator"></span>
+            <span id="statusText">Connecting...</span>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" onclick="startRecording()">🎙️ Start Recording</button>
+            <button id="stopBtn" onclick="stopRecording()" disabled>⏹️ Stop Recording</button>
+            <button id="clearBtn" onclick="clearTranscript()">🗑️ Clear Transcript</button>
+        </div>
+        
+        <div class="transcript-container">
+            <div class="transcript" id="transcript">
+                Click "Start Recording" to begin transcribing your microphone audio...
+            </div>
+        </div>
+        
+        <div class="note">
+            <strong>📝 Instructions:</strong>
+            <br>• Click "Start Recording" and allow microphone access when prompted
+            <br>• Speak clearly into your microphone
+            <br>• The transcript will appear in real-time above
+            <br>• Use "Clear Transcript" to start fresh
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let mediaRecorder;
+        let audioStream;
+        let isRecording = false;
+        let audioChunks = [];
+
+        // DOM elements
+        const statusText = document.getElementById('statusText');
+        const micIndicator = document.getElementById('micIndicator');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const transcript = document.getElementById('transcript');
+
+        // Socket events
+        socket.on('connect', function() {
+            statusText.textContent = 'Connected - Ready to record';
+        });
+
+        socket.on('connected', function(data) {
+            statusText.textContent = data.status;
+        });
+
+        socket.on('transcript_update', function(data) {
+            transcript.textContent = data.transcript;
+            transcript.scrollTop = transcript.scrollHeight;
+        });
+
+        socket.on('error', function(data) {
+            statusText.textContent = 'Error: ' + data.message;
+            console.error('Socket error:', data);
+        });
+
+        async function startRecording() {
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        sampleRate: 44100
+                    } 
+                });
+
+                mediaRecorder = new MediaRecorder(audioStream, {
+                    mimeType: 'audio/webm'
+                });
+
+                audioChunks = [];
+
+                mediaRecorder.addEventListener('dataavailable', event => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                });
+
+                mediaRecorder.addEventListener('stop', async () => {
+                    if (audioChunks.length > 0) {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const arrayBuffer = await audioBlob.arrayBuffer();
+                        const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+                        
+                        socket.emit('audio_data', { 
+                            audio: base64Audio,
+                            type: 'audio/webm'
+                        });
+                    }
+                    audioChunks = [];
+                });
+
+                // Record in chunks of 3 seconds
+                mediaRecorder.start();
+                setInterval(() => {
+                    if (isRecording && mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                        mediaRecorder.start();
+                    }
+                }, 3000);
+
+                isRecording = true;
+                updateUI();
+                statusText.textContent = 'Recording... Speak into your microphone';
+
+            } catch (error) {
+                console.error('Error starting recording:', error);
+                statusText.textContent = 'Error: Could not access microphone';
+                alert('Please allow microphone access to use this app');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+            
+            if (audioStream) {
+                audioStream.getTracks().forEach(track => track.stop());
+            }
+            
+            isRecording = false;
+            updateUI();
+            statusText.textContent = 'Stopped recording';
+        }
+
+        function clearTranscript() {
+            socket.emit('clear_transcript');
+            transcript.textContent = 'Transcript cleared. Start recording to begin...';
+        }
+
+        function updateUI() {
+            startBtn.disabled = isRecording;
+            stopBtn.disabled = !isRecording;
+            
+            if (isRecording) {
+                startBtn.classList.add('recording');
+                micIndicator.classList.add('mic-active');
+            } else {
+                startBtn.classList.remove('recording');
+                micIndicator.classList.remove('mic-active');
+            }
+        }
+
+        // Initialize UI
+        updateUI();
+    </script>
+</body>
+</html>
