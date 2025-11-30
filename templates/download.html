@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Ecoute Client - Desktop System Audio Transcription</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #FFFCF2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .feature-list {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-list h3 {
+            margin-bottom: 15px;
+            color: #FFD60A;
+        }
+        
+        .feature-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .feature-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #FFD60A;
+            font-weight: bold;
+        }
+        
+        .download-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .download-button {
+            background: linear-gradient(45deg, #FFD60A, #FFC300);
+            color: #003566;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 214, 10, 0.3);
+        }
+        
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 214, 10, 0.4);
+        }
+        
+        .download-button.secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            color: #FFFCF2;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+        
+        .download-button.secondary:hover {
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #FFD60A;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            border-left: 4px solid #FFD60A;
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #FFD60A;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .warning-title {
+            color: #FFD60A;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #FFD60A;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .file-info {
+            display: none;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .file-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎧 Ecoute Desktop Client</h1>
+        <p class="subtitle">Capture system audio for real-time transcription</p>
+        
+        <div class="feature-list">
+            <h3>Why use the Desktop Client?</h3>
+            <ul>
+                <li>Record system audio (what your computer is playing)</li>
+                <li>Bypass browser limitations for audio capture</li>
+                <li>Real-time transcription of any audio on your system</li>
+                <li>Works with music, videos, calls, and any system audio</li>
+                <li>Simple GUI interface with device selection</li>
+                <li>Connects seamlessly to the web app server</li>
+            </ul>
+        </div>
+        
+        <div class="warning">
+            <div class="warning-title">⚠️ Platform Notes</div>
+            <strong>Windows:</strong> Supports direct system audio capture via WASAPI loopback<br>
+            <strong>macOS/Linux:</strong> May require additional audio routing software (e.g., Loopback, BlackHole)
+        </div>
+        
+        <div class="download-section">
+            <h3 style="color: #FFD60A; margin-bottom: 20px;">Download Options</h3>
+            
+            <a href="/download/client-package" class="download-button">
+                📦 Download Complete Package (ZIP)
+            </a>
+            
+            <a href="#" class="download-button secondary" onclick="showFileInfo()">
+                📄 View Individual Files
+            </a>
+            
+            <div id="file-info" class="file-info">
+                <h4 style="color: #FFD60A; margin-bottom: 10px;">Individual Files:</h4>
+                <div id="file-list">Loading...</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Installation Instructions</h3>
+            <ol>
+                <li>
+                    <strong>Install Python 3.7+</strong><br>
+                    Download from <a href="https://python.org" target="_blank" style="color: #FFD60A;">python.org</a>
+                </li>
+                <li>
+                    <strong>Download and extract the client package</strong><br>
+                    Use the download button above
+                </li>
+                <li>
+                    <strong>Install dependencies</strong>
+                    <div class="code-block">pip install -r client_requirements.txt</div>
+                </li>
+                <li>
+                    <strong>Run the client</strong>
+                    <div class="code-block">python client_app.py</div>
+                </li>
+                <li>
+                    <strong>Connect to server</strong><br>
+                    Enter your server URL (e.g., http://localhost:5000) and click Connect
+                </li>
+                <li>
+                    <strong>Select audio device</strong><br>
+                    Choose your system audio output or WASAPI loopback device
+                </li>
+                <li>
+                    <strong>Start recording</strong><br>
+                    Click "Start Recording" to begin system audio transcription
+                </li>
+            </ol>
+        </div>
+        
+        <div class="instructions">
+            <h3>Troubleshooting</h3>
+            <ul style="list-style: disc; padding-left: 20px;">
+                <li><strong>No audio devices shown:</strong> Try running as administrator or check audio drivers</li>
+                <li><strong>Can't capture system audio on macOS:</strong> Install audio routing software like Loopback</li>
+                <li><strong>Connection failed:</strong> Ensure the web app server is running and accessible</li>
+                <li><strong>Poor audio quality:</strong> Check audio device settings and sample rate</li>
+            </ul>
+        </div>
+        
+        <div class="back-link">
+            <a href="/">← Back to Web Transcription</a>
+        </div>
+    </div>
+    
+    <script>
+        async function showFileInfo() {
+            const fileInfo = document.getElementById('file-info');
+            const fileList = document.getElementById('file-list');
+            
+            if (fileInfo.style.display === 'block') {
+                fileInfo.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/client-files');
+                const data = await response.json();
+                
+                if (data.error) {
+                    fileList.innerHTML = `<p style="color: #ff6b6b;">Error: ${data.error}</p>`;
+                } else {
+                    let html = '';
+                    data.files.forEach(file => {
+                        const sizeKB = Math.round(file.size / 1024 * 100) / 100;
+                        html += `
+                            <div class="file-item">
+                                <strong><a href="/download/${file.name}" style="color: #FFD60A;">${file.name}</a></strong><br>
+                                <small>${file.description} (${sizeKB} KB)</small>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(255, 214, 10, 0.1); border-radius: 5px;">
+                            <strong>Installation Commands:</strong><br>
+                            <code style="color: #FFD60A;">${data.instructions.install}</code><br>
+                            <code style="color: #FFD60A;">${data.instructions.run}</code>
+                        </div>
+                    `;
+                    
+                    fileList.innerHTML = html;
+                }
+                
+                fileInfo.style.display = 'block';
+            } catch (error) {
+                fileList.innerHTML = `<p style="color: #ff6b6b;">Error loading file information: ${error.message}</p>`;
+                fileInfo.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

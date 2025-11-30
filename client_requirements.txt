@@ -1,0 +1,5 @@
+# Client application requirements
+python-socketio==5.8.0
+pyaudio==0.2.11
+tkinter  # Usually comes with Python
+PyAudioWPatch==0.2.12.14  # For Windows system audio capture

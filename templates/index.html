@@ -150,6 +150,10 @@
         <div class="warning">
             <strong>⚠️ Note:</strong> This web app can only access microphone audio due to browser security restrictions. 
             System/speaker audio capture is not available in web browsers.
+            <br><br>
+            <strong>💡 Want to transcribe system audio?</strong> 
+            <a href="/download" style="color: #FFD60A; text-decoration: underline;">Download our Desktop Client</a> 
+            for full system audio capture capabilities!
         </div>
         
         <div class="status" id="status">
@@ -161,6 +165,9 @@
             <button id="startBtn" onclick="startRecording()">🎙️ Start Recording</button>
             <button id="stopBtn" onclick="stopRecording()" disabled>⏹️ Stop Recording</button>
             <button id="clearBtn" onclick="clearTranscript()">🗑️ Clear Transcript</button>
+            <button onclick="window.open('/download', '_blank')" style="background: linear-gradient(45deg, #FFD60A, #FFC300); color: #003566;">
+                💻 Download Desktop Client
+            </button>
         </div>
         
         <div class="transcript-container">
